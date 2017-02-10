@@ -3,6 +3,9 @@
 - [ ] ASP.NET Core TagHelper support
 - [ ] Create additional source map for the bundle files
 - [ ] Adopt new VS Error List API
+- [x] Updated NuGet package to support .NET Core vNext
+- [x] Added support to preserve Knockout containerless bindings and (0, eval) JavaScript expressions (#135 & #63)
+- [x] Added "KeepOneSpaceWhenCollapsing" to HTML options (#199)
 
 Features that have a checkmark are complete and available for
 download in the

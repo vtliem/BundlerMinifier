@@ -18,7 +18,8 @@ namespace BundlerMinifier
                 RemoveComments = JavaScriptOptions.GetValue(bundle, "removeHtmlComments", true),// == "True",
                 RemoveQuotedAttributes = JavaScriptOptions.GetValue(bundle, "removeQuotedAttributes", true),// == "True",
                 CollapseWhitespaces = JavaScriptOptions.GetValue(bundle, "collapseWhitespace", true),// == "True",
-                IsFragmentOnly = JavaScriptOptions.GetValue(bundle, "isFragmentOnly", true)// == "True"
+                IsFragmentOnly = JavaScriptOptions.GetValue(bundle, "isFragmentOnly", true),// == "True"
+				KeepOneSpaceWhenCollapsing = JavaScriptOptions.GetValue(bundle, "keepOneSpaceWhenCollapsing", false)// == "True"
             };
 
             return settings;
