@@ -33,7 +33,7 @@ namespace BundlerMinifier
             Log.LogMessage(MessageImportance.High, Environment.NewLine + "Bundler: Begin processing " + configFile.Name);
 
             BundleFileProcessor processor = new BundleFileProcessor();
-            processor.Processing += (s, e) => { RemoveReadonlyFlagFromFile(e.Bundle.GetAbsoluteOutputFile()); };
+            processor.Processing += (s, e) => { RemoveReadonlyFlagFromFile(e.Bundle.OutputFileName); };
             processor.AfterBundling += Processor_AfterProcess;
             BundleMinifier.BeforeWritingMinFile += (s, e) => { RemoveReadonlyFlagFromFile(e.ResultFile); };
             processor.BeforeWritingSourceMap += (s, e) => { RemoveReadonlyFlagFromFile(e.ResultFile); };

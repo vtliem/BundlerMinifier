@@ -161,16 +161,18 @@ namespace BundlerMinifierVsix.Commands
 
         private static Bundle CreateBundleFile(IEnumerable<string> files, string outputFile)
         {
+
             var bundle = new Bundle
             {
-                IncludeInProject = true,
-                OutputFileName = outputFile
+                // IncludeInProject = true,
+                OutputFileName = outputFile,
+                InputFiles = new List<string>(files)
             };
 
-            bundle.InputFiles.AddRange(files);
+            //bundle.InputFiles.AddRange(files);
             return bundle;
         }
-        
+
         private static string GetOutputFileName(string inputFile, string extension)
         {
             string ext = extension.TrimStart('.');

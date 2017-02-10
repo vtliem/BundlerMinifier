@@ -61,12 +61,12 @@ namespace BundlerMinifier
 
         private bool SetCompare<T>(IEnumerable<T> left, IEnumerable<T> right, IEqualityComparer<T> comparer)
         {
-            if(left == null && right == null)
+            if (left == null && right == null)
             {
                 return true;
             }
 
-            if((left != null) != (right != null))
+            if ((left != null) != (right != null))
             {
                 return false;
             }
@@ -100,11 +100,12 @@ namespace BundlerMinifier
                 return false;
             }
 
-            var inputs = _bundle.GetAbsoluteInputFiles();
-            var inputLastModified = inputs.Count > 0 ? inputs.Max(inputFile => File.GetLastWriteTimeUtc(inputFile)) : DateTime.MaxValue;
+            var inputs = _bundle.InputFiles;//.GetAbsoluteInputFiles();
+            var inputLastModified = inputs != null && inputs.Count > 0 ? inputs.Max(inputFile => File.GetLastWriteTimeUtc(inputFile)) : DateTime.MaxValue;
 
-            if ((_bundle.GetAbsoluteInputFiles().Count > 1 || _bundle.InputFiles.FirstOrDefault() != _bundle.OutputFileName)
-                && inputLastModified > File.GetLastWriteTimeUtc(_bundle.GetAbsoluteOutputFile()))
+            //if ((_bundle.GetAbsoluteInputFiles().Count > 1 || _bundle.InputFiles.FirstOrDefault() != _bundle.OutputFileName)
+            if((inputs.Count > 1 || inputs.FirstOrDefault() !=_bundle.OutputFileName)
+                && inputLastModified > File.GetLastWriteTimeUtc(_bundle.OutputFileName))
             {
                 return _processor.Process(_configFile, new Bundle[] { _bundle });
             }

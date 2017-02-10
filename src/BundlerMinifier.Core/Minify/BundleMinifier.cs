@@ -12,10 +12,9 @@ namespace BundlerMinifier
     {
         public static MinificationResult MinifyBundle(Bundle bundle)
         {
-            string file = bundle.GetAbsoluteOutputFile();
+            string file = bundle.OutputFileName;//.GetAbsoluteOutputFile();
             string extension = Path.GetExtension(file).ToUpperInvariant();
             var minResult = new MinificationResult(file, null, null);
-
             if (!string.IsNullOrEmpty(bundle.Output) && bundle.IsMinificationEnabled)
             {
                 try
@@ -44,11 +43,11 @@ namespace BundlerMinifier
             {
                 OnErrorMinifyingFile(minResult);
             }
-            else if (bundle.IsGzipEnabled)
-            {
-                string minFile = bundle.IsMinificationEnabled ? GetMinFileName(bundle.GetAbsoluteOutputFile()) : bundle.GetAbsoluteOutputFile();
-                GzipFile(minFile, bundle, minResult);
-            }
+            //else if (bundle.IsGzipEnabled)
+            //{
+            //    string minFile = bundle.IsMinificationEnabled ? GetMinFileName(bundle.GetAbsoluteOutputFile()) : bundle.GetAbsoluteOutputFile();
+            //    GzipFile(minFile, bundle, minResult);
+            //}
 
             return minResult;
         }
@@ -65,7 +64,7 @@ namespace BundlerMinifier
             }
             else
             {
-                string minFile = GetMinFileName(minResult.FileName);
+                string minFile = bundle.OutputFileMin;
                 string mapFile = minFile + ".map";
 
                 using (StringWriter writer = new StringWriter())
@@ -80,7 +79,7 @@ namespace BundlerMinifier
 
                         if (bundle.OutputIsMinFile)
                         {
-                            var inputs = bundle.GetAbsoluteInputFiles();
+                            var inputs = bundle.InputFiles;//.GetAbsoluteInputFiles();
 
                             if (inputs.Count == 1)
                                 file = inputs[0];
@@ -113,7 +112,7 @@ namespace BundlerMinifier
 
         private static void WriteMinFile(Bundle bundle, MinificationResult minResult, UgliflyResult uglifyResult)
         {
-            var minFile = GetMinFileName(minResult.FileName);
+            var minFile = bundle.OutputFileMin;
             minResult.MinifiedContent = uglifyResult.Code?.Trim();
 
             if (!uglifyResult.HasErrors)
@@ -124,6 +123,24 @@ namespace BundlerMinifier
 
                 if (containsChanges)
                 {
+                    if (bundle.InputFiles.Contains(minFile))
+                    {
+                        BundleConfig.Log(bundle.Config.OutputBase, "Input files contains output min file:" + minFile);
+                        minResult.Errors.Add(new MinificationError()
+                        {
+                            FileName = bundle.OutputFileName,
+                            Message = "Input files contains output min file"
+                        });
+                        return;
+                    }
+                    if (!Directory.Exists(Path.GetDirectoryName(minFile)))
+                    {
+                        Directory.CreateDirectory(Path.GetDirectoryName(minFile));
+                    }
+                    else if (File.Exists(minFile))
+                    {
+                        File.Delete(minFile);
+                    }
                     File.WriteAllText(minFile, minResult.MinifiedContent, new UTF8Encoding(false));
                     OnAfterWritingMinFile(minResult.FileName, minFile, bundle, containsChanges);
                 }
@@ -133,28 +150,97 @@ namespace BundlerMinifier
                 AddNUglifyErrors(uglifyResult, minResult);
             }
         }
-
-        [SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
-        private static void GzipFile(string sourceFile, Bundle bundle, MinificationResult result)
+        private static readonly string[] TEXTS ={
+            ".js",
+            ".html",
+            ".json",
+            ".css",
+            ".html",
+            ".txt",
+            ".xml",
+            ".svg"
+        };
+        private static bool MustUseGZipTextMode(Bundle bundle, string file)
         {
-            var gzipFile = sourceFile + ".gz";
-            var containsChanges = result.Changed || File.GetLastWriteTimeUtc(gzipFile) < File.GetLastWriteTimeUtc(sourceFile);
-
-            OnBeforeWritingGzipFile(sourceFile, gzipFile, bundle, containsChanges);
-
-            if (containsChanges)
+            var ext = Path.GetExtension(file);
+            if (ext == null || ext.Length == 0) return false;
+            foreach (var txt in TEXTS)
             {
-                byte[] buffer = Encoding.UTF8.GetBytes(result.MinifiedContent??bundle.Output);
-
+                if (txt.Equals(ext, StringComparison.OrdinalIgnoreCase)) return true;
+            }
+            return false;
+        }
+        [SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
+        internal static void GzipFile(Bundle bundle, bool force)
+        {
+            var sourceFile = bundle.OutputFileMin ?? bundle.OutputFileName;
+            var gzipFile = sourceFile + ".gz";
+            if (force || BundleExt.IsChanged(sourceFile, gzipFile, false))
+            {
+                OnBeforeWritingGzipFile(sourceFile, gzipFile, bundle, true);
+                if (File.Exists(gzipFile))
+                {
+                    File.Delete(gzipFile);
+                }
                 using (var fileStream = File.OpenWrite(gzipFile))
                 using (var gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal))
                 {
-                    gzipStream.Write(buffer, 0, buffer.Length);
-                }
+                    if (MustUseGZipTextMode(bundle, sourceFile))
+                    {
+                        using (var reader = File.OpenText(sourceFile))
+                        using (var writer = new StreamWriter(gzipStream, reader.CurrentEncoding))
+                        {
+                            var buff = new char[1024 * 16];
+                            int len;
+                            while ((len = reader.ReadBlock(buff, 0, buff.Length)) > 0)
+                            {
+                                writer.Write(buff, 0, len);
+                            }
+                        }
 
-                OnAfterWritingGzipFile(sourceFile, gzipFile, bundle, containsChanges);
+                    }
+                    else
+                    {
+                        using (var input = File.OpenRead(sourceFile))
+                        {
+                            input.CopyTo(gzipStream);
+                        }
+                    }
+                }
+                var f1 = new FileInfo(sourceFile);
+                var f2 = new FileInfo(gzipFile);
+                if (f1.Length <= f2.Length)
+                {
+                    f2.Delete();
+                }
+                OnAfterWritingGzipFile(sourceFile, gzipFile, bundle, true);
+
+            }
+            else
+            {
+                OnBeforeWritingGzipFile(sourceFile, gzipFile, bundle, false);
             }
         }
+        //private static void GzipFile(string sourceFile, Bundle bundle, MinificationResult result)
+        //{
+        //    var gzipFile = sourceFile + ".gz";
+        //    var containsChanges = result.Changed || File.GetLastWriteTimeUtc(gzipFile) < File.GetLastWriteTimeUtc(sourceFile);
+
+        //    OnBeforeWritingGzipFile(sourceFile, gzipFile, bundle, containsChanges);
+
+        //    if (containsChanges)
+        //    {
+        //        byte[] buffer = Encoding.UTF8.GetBytes(result.MinifiedContent ?? bundle.Output);
+
+        //        using (var fileStream = File.OpenWrite(gzipFile))
+        //        using (var gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal))
+        //        {
+        //            gzipStream.Write(buffer, 0, buffer.Length);
+        //        }
+
+        //        OnAfterWritingGzipFile(sourceFile, gzipFile, bundle, containsChanges);
+        //    }
+        //}
 
         private static void AddNUglifyErrors(UgliflyResult minifier, MinificationResult minResult)
         {
@@ -191,7 +277,7 @@ namespace BundlerMinifier
                 return file;
 
             string ext = Path.GetExtension(file);
-            return file.Substring(0, file.LastIndexOf(ext, StringComparison.OrdinalIgnoreCase)) + ".min" + ext;
+            return file.Substring(0, file.Length - ext.Length/* file.LastIndexOf(ext, StringComparison.OrdinalIgnoreCase)*/) + ".min" + ext;
         }
 
         static void OnBeforeWritingMinFile(string file, string minFile, Bundle bundle, bool containsChanges)

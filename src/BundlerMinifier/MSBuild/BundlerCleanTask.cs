@@ -2,6 +2,7 @@
 using System.IO;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using System.Collections.Generic;
 
 namespace BundlerMinifier
 {
@@ -21,14 +22,28 @@ namespace BundlerMinifier
                 return true;
             }
 
-            var bundles = BundleHandler.GetBundles(configFile.FullName);
-
+            IEnumerable<Bundle> bundles;
+            try
+            {
+                bundles = BundleHandler.GetBundles(configFile.FullName);
+            }
+            catch (Exception ex)
+            {
+                Log.LogError($"There was an error reading {configFile.Name}", ex);
+                return false;
+            }
             if (bundles != null)
             {
+
                 foreach (Bundle bundle in bundles)
                 {
-                    var outputFile = bundle.GetAbsoluteOutputFile();
-                    var inputFiles = bundle.GetAbsoluteInputFiles();
+                    if (bundle.Config.DeleteOutputBaseOnClean)
+                    {
+                        Directory.Delete(bundle.Config.OutputBase, true);
+                        break;
+                    }
+                    var outputFile = bundle.OutputFileName;//.GetAbsoluteOutputFile();
+                    var inputFiles = bundle.InputFiles;//.GetAbsoluteInputFiles();
 
                     var minFile = BundleMinifier.GetMinFileName(outputFile);
                     var mapFile = minFile + ".map";

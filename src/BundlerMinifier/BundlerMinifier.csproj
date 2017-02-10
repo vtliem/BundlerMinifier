@@ -62,8 +62,68 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\BundlerMinifier.Core\**\*.cs" Exclude="..\BundlerMinifier.Core\obj\**;..\BundlerMinifier.Core\bin\**">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+    <Compile Include="..\BundlerMinifier.Core\Bundle\Bundle.cs">
+      <Link>Bundle\Bundle.cs</Link>
+    </Compile>
+    <Compile Include="..\BundlerMinifier.Core\Bundle\BundleFileEventArgs.cs">
+      <Link>Bundle\BundleFileEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\BundlerMinifier.Core\Bundle\BundleFileProcessor.cs">
+      <Link>Bundle\BundleFileProcessor.cs</Link>
+    </Compile>
+    <Compile Include="..\BundlerMinifier.Core\Bundle\BundleHandler.cs">
+      <Link>Bundle\BundleHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\BundlerMinifier.Core\ChangeHandler.cs">
+      <Link>ChangeHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\BundlerMinifier.Core\Constants.cs">
+      <Link>Constants.cs</Link>
+    </Compile>
+    <Compile Include="..\BundlerMinifier.Core\Helpers\FileHelpers.cs">
+      <Link>Helpers\FileHelpers.cs</Link>
+    </Compile>
+    <Compile Include="..\BundlerMinifier.Core\Minify\BundleMinifier.cs">
+      <Link>Minify\BundleMinifier.cs</Link>
+    </Compile>
+    <Compile Include="..\BundlerMinifier.Core\Minify\CssOptions.cs">
+      <Link>Minify\CssOptions.cs</Link>
+    </Compile>
+    <Compile Include="..\BundlerMinifier.Core\Minify\CssRelativePathAdjuster.cs">
+      <Link>Minify\CssRelativePathAdjuster.cs</Link>
+    </Compile>
+    <Compile Include="..\BundlerMinifier.Core\Minify\HtmlOptions.cs">
+      <Link>Minify\HtmlOptions.cs</Link>
+    </Compile>
+    <Compile Include="..\BundlerMinifier.Core\Minify\JavaScriptOptions.cs">
+      <Link>Minify\JavaScriptOptions.cs</Link>
+    </Compile>
+    <Compile Include="..\BundlerMinifier.Core\Minify\MinificationError.cs">
+      <Link>Minify\MinificationError.cs</Link>
+    </Compile>
+    <Compile Include="..\BundlerMinifier.Core\Minify\MinificationResult.cs">
+      <Link>Minify\MinificationResult.cs</Link>
+    </Compile>
+    <Compile Include="..\BundlerMinifier.Core\Minify\MinifyFileEventArgs.cs">
+      <Link>Minify\MinifyFileEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\BundlerMinifier.Core\Minimatch\Minimatcher.cs">
+      <Link>Minimatch\Minimatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\BundlerMinifier.Core\Program.cs">
+      <Link>Program.cs</Link>
+    </Compile>
+    <Compile Include="..\BundlerMinifier.Core\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\BundlerMinifier.Core\StringExtensions.cs">
+      <Link>StringExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\BundlerMinifier.Core\Telemetry.cs">
+      <Link>Telemetry.cs</Link>
+    </Compile>
+    <Compile Include="..\BundlerMinifier.Core\Watcher.cs">
+      <Link>Watcher.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

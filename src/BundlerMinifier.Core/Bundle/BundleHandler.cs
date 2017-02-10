@@ -12,19 +12,20 @@ namespace BundlerMinifier
     {
         public static void AddBundle(string configFile, Bundle newBundle)
         {
-            IEnumerable<Bundle> existing = GetBundles(configFile)
-                .Where(x => !x.OutputFileName.Equals(newBundle.OutputFileName));
+            IEnumerable<Bundle> existing = GetBundles(configFile, false, true)
+                .Where(x => !x.Equals(newBundle));
 
             List<Bundle> bundles = new List<Bundle>();
 
             bundles.AddRange(existing);
             bundles.Add(newBundle);
-            newBundle.FileName = configFile;
+            //newBundle.FileName = configFile;
 
             JsonSerializerSettings settings = new JsonSerializerSettings()
             {
                 Formatting = Formatting.Indented,
                 DefaultValueHandling = DefaultValueHandling.Ignore,
+                NullValueHandling = NullValueHandling.Ignore
             };
 
             string content = JsonConvert.SerializeObject(bundles, settings);
@@ -33,7 +34,7 @@ namespace BundlerMinifier
 
         public static void RemoveBundle(string configFile, Bundle bundleToRemove)
         {
-            IEnumerable<Bundle> bundles = GetBundles(configFile);
+            IEnumerable<Bundle> bundles = GetBundles(configFile, false, true);
             List<Bundle> newBundles = new List<Bundle>();
 
             if (bundles.Contains(bundleToRemove))
@@ -43,58 +44,77 @@ namespace BundlerMinifier
                 File.WriteAllText(configFile, content);
             }
         }
-
-        public static bool TryGetBundles(string configFile, out IEnumerable<Bundle> bundles)
+        /// <summary>
+        /// Read config.josn
+        /// </summary>
+        /// <param name="configFile"></param>
+        /// <param name="bundles"></param>
+        /// <param name="throwEx">raise exception when error</param>
+        /// <param name="forUpdate">for update config.json</param>
+        /// <returns></returns>
+        public static bool TryGetBundles(string configFile, out IEnumerable<Bundle> bundles, bool throwEx = false, bool forUpdate = false)
         {
-            try
-            {
-                if (string.IsNullOrEmpty(configFile) || !File.Exists(configFile))
-                {
-                    bundles = Enumerable.Empty<Bundle>();
-                    return false;
-                }
-
-                configFile = new FileInfo(configFile).FullName;
-                string content = File.ReadAllText(configFile);
-                bundles = JArray.Parse(content).ToObject<Bundle[]>();
-
-                foreach (Bundle bundle in bundles)
-                {
-                    bundle.FileName = configFile;
-                }
-
-                return true;
-            }
-            catch
-            {
-                bundles = null;
-                return false;
-            }
+            return BundleExt.TryGetBundles(configFile, out bundles, throwEx, forUpdate);
         }
+        //{
+        //    try
+        //    {
+        //        if (string.IsNullOrEmpty(configFile) || !File.Exists(configFile))
+        //        {
+        //            bundles = Enumerable.Empty<Bundle>();
+        //            return false;
+        //        }
 
-        public static IEnumerable<Bundle> GetBundles(string configFile)
+        //        configFile = new FileInfo(configFile).FullName;
+        //        string content = File.ReadAllText(configFile);
+        //        bundles = JArray.Parse(content).ToObject<Bundle[]>();
+
+        //        foreach (Bundle bundle in bundles)
+        //        {
+        //            bundle.FileName = configFile;
+        //        }
+
+        //        return true;
+        //    }
+        //    catch
+        //    {
+        //        bundles = null;
+        //        return false;
+        //    }
+        //}
+        /// <summary>
+        /// Read and parse config.json
+        /// </summary>
+        /// <param name="configFile"></param>
+        /// <param name="throwEx">Raise exception when error</param>
+        /// <param name="forUpdate">For update config.json</param>
+        /// <returns></returns>
+        public static IEnumerable<Bundle> GetBundles(string configFile, bool throwEx = true, bool forUpdate = false)
         {
             IEnumerable<Bundle> bundles;
-            TryGetBundles(configFile, out bundles);
+            BundleExt.TryGetBundles(configFile, out bundles, throwEx, forUpdate);
             return bundles;
         }
-
+        /// <summary>
+        /// Get all input text
+        /// </summary>
+        /// <param name="baseFolder">unused</param>
+        /// <param name="bundle"></param>
         public static void ProcessBundle(string baseFolder, Bundle bundle)
         {
             StringBuilder sb = new StringBuilder();
-            List<string> inputFiles = bundle.GetAbsoluteInputFiles();
-
-            foreach (string input in inputFiles)
+            List<string> inputFiles = bundle.InputFiles;// GetAbsoluteInputFiles();
+            foreach (string file in inputFiles)
             {
-                string file = Path.Combine(baseFolder, input);
+                //string  file = Path.Combine(baseFolder, input);
 
                 if (File.Exists(file))
                 {
                     string content;
 
-                    if (input.EndsWith(".css", StringComparison.OrdinalIgnoreCase) && AdjustRelativePaths(bundle))
+                    if (bundle.AdjustRelativePaths)
                     {
-                        content = CssRelativePath.Adjust(file, bundle.GetAbsoluteOutputFile());
+                        content = CssRelativePath.Adjust(file, bundle.OutputFileName);//.GetAbsoluteOutputFile());
                     }
                     else
                     {
@@ -108,12 +128,13 @@ namespace BundlerMinifier
             bundle.Output = sb.ToString().Trim();
         }
 
-        private static bool AdjustRelativePaths(Bundle bundle)
-        {
-            if (!bundle.Minify.ContainsKey("adjustRelativePaths"))
-                return true;
+        //internal static bool AdjustRelativePaths(Bundle bundle)
+        //{
 
-            return bundle.Minify["adjustRelativePaths"].ToString() == "True";
-        }
+        //    //if (!bundle.Minify.ContainsKey("adjustRelativePaths"))
+        //    //    return true;
+
+        //    //return bundle.Minify["adjustRelativePaths"].ToString() == "True";
+        //}
     }
 }

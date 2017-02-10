@@ -66,12 +66,10 @@ namespace BundlerMinifierVsix.Commands
                 return;
 
             var config = project.GetConfigFile();
-
-            if (!BundleService.IsOutputProduced(config))
-                return;
-
             try
             {
+                if (!BundleService.IsOutputProduced(config))
+                    return;
                 if (!string.IsNullOrEmpty(config) && File.Exists(config))
                 {
                     var fsw = new FileSystemWatcher(project.GetRootFolder());

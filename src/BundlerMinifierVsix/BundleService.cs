@@ -83,7 +83,7 @@ namespace BundlerMinifierVsix
 
                 foreach (Bundle bundle in bundles)
                 {
-                    if (bundle.GetAbsoluteOutputFile().Equals(sourceFile, StringComparison.OrdinalIgnoreCase))
+                    if (bundle.OutputFileName.Equals(sourceFile, StringComparison.OrdinalIgnoreCase))
                         list.Add(bundle);
                 }
             }
@@ -102,8 +102,16 @@ namespace BundlerMinifierVsix
 
         public static void Process(string configFile, IEnumerable<Bundle> bundles)
         {
-            if (!IsOutputProduced(configFile))
+            try
+            {
+                if (!IsOutputProduced(configFile))
+                    return;
+            }
+            catch (Exception ex)
+            {
+                HandleProcessingException(configFile, ex);
                 return;
+            }
 
             ThreadPool.QueueUserWorkItem((o) =>
             {
@@ -131,7 +139,7 @@ namespace BundlerMinifierVsix
                 return !lines.Any(l => l.TrimStart().StartsWith("produceoutput=false", StringComparison.OrdinalIgnoreCase));
             }
 
-            return BundlerMinifierPackage.Options.ProduceOutput;
+            return BundlerMinifierPackage.Options != null && BundlerMinifierPackage.Options.ProduceOutput;
         }
 
         public static void ToggleOutputProduction(string configFile, bool produceOutput)
@@ -159,8 +167,16 @@ namespace BundlerMinifierVsix
 
         public static void SourceFileChanged(string configFile, string sourceFile)
         {
-            if (!IsOutputProduced(configFile))
+            try
+            {
+                if (!IsOutputProduced(configFile))
+                    return;
+            }
+            catch (Exception ex)
+            {
+                HandleProcessingException(configFile, ex);
                 return;
+            }
 
             ThreadPool.QueueUserWorkItem((o) =>
             {

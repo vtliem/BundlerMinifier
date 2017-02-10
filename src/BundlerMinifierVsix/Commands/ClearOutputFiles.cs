@@ -84,11 +84,18 @@ namespace BundlerMinifierVsix.Commands
             {
                 return;
             }
+            try
+            {
+                var bundles = BundleHandler.GetBundles(configFile);
 
-            var bundles = BundleHandler.GetBundles(configFile);
+                BundleFileProcessor processor = new BundleFileProcessor();
+                processor.Clean(configFile, bundles);
 
-            BundleFileProcessor processor = new BundleFileProcessor();
-            processor.Clean(configFile, bundles);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex);
+            }
         }
 
         private void Deletefile(string file)

@@ -1,0 +1,184 @@
+[
+  {
+    "config": true,
+    "outputFileName": "..\\build\\webapp",
+    "minify": {
+      "enabled": true,
+      "gzip": true,
+      "adjustRelativePaths": false
+    }
+  },
+  {
+    "resource": true,
+    "recursively": true,
+    "excludes": [
+      "iconfont.eot",
+      "highlight.pack.js",
+      "?\\\\pdfviewer\\\\pdfjs\\\\.+\\.js$"
+    ],
+    "outputFileName": "",
+    "inputFiles": [
+      "client",
+      "css",
+      "media",
+      "*.txt",
+      "*.html",
+      "*.png",
+      "js\\additions\\langs",
+      "js\\additions\\texteditor",
+      "js\\additions\\ui.emoticons.js",
+      "noavatar.svg"
+    ]
+  },
+  {
+    "resource": true,
+    "recursively": true,
+    "excludes": [
+      "?\\\\pdfviewer\\\\pdfjs\\\\.+\\.js$"
+    ],
+    "outputFileName": "",
+    "inputFiles": [
+      "pdfviewer"
+    ],
+    "category": "pdfviewer"
+  },
+  {
+    "outputFileName": "pdfviewer\\pdfjs\\web\\compatibility.js",
+    "inputFiles": [
+      "pdfviewer\\pdfjs\\web\\compatibility.min.js"
+    ],
+    "minify": {
+      "enabled": false
+    },
+    "category": "pdfviewer"
+  },
+  {
+    "outputFileName": "pdfviewer\\pdfjs\\web\\pdf_viewer.js",
+    "inputFiles": [
+      "pdfviewer\\pdfjs\\web\\pdf_viewer.min.js"
+    ],
+    "minify": {
+      "enabled": false
+    },
+    "category": "pdfviewer"
+  },
+  {
+    "outputFileName": "pdfviewer\\pdfjs\\build\\pdf.js",
+    "inputFiles": [
+      "pdfviewer\\pdfjs\\build\\pdf.min.js"
+    ],
+    "minify": {
+      "enabled": false
+    },
+    "category": "pdfviewer"
+  },
+  {
+    "outputFileName": "pdfviewer\\pdfjs\\build\\pdf.worker.js",
+    "inputFiles": [
+      "pdfviewer\\pdfjs\\build\\pdf.worker.min.js"
+    ],
+    "minify": {
+      "enabled": false
+    },
+    "category": "pdfviewer"
+  },
+  {
+    "resource": true,
+    "recursively": true,
+    "excludes": [
+      "highlight.pack.js"
+    ],
+    "outputFileName": "",
+    "inputFiles": [
+      "js\\libs\\colorpicker\\*.md",
+      "js\\libs\\darkroomjs\\*md",
+      "js\\libs\\darkroomjs\\darkroomjs_LICENSE",
+      "js\\libs\\darkroomjs\\*.json",
+      "js\\libs\\fabricjs\\fabric_LICENSE",
+      "js\\libs\\highlight"
+    ],
+    "category": "libs"
+  },
+  {
+    "resource": true,
+    "recursively": true,
+    "outputFileName": "",
+    "inputFiles": [
+      "js\\libs\\highlight\\highlight.pack.js",
+      "js\\libs\\ace"
+    ],
+    "minify": {
+      "enabled": false
+    },
+    "category": "libs"
+  },
+  {
+    "outputFileName": "js\\additions\\imageeditor\\ui.imageeditor.js",
+    "inputFiles": [
+      "js\\additions\\imageeditor\\ui.imageeditor.js",
+      "js/libs/fabricjs/fabric.js",
+      "js/libs/darkroomjs/darkroom.js",
+      "js/additions/imageeditor/plugins/crop.js",
+      "js/additions/imageeditor/plugins/rotate.js",
+      "js/additions/imageeditor/plugins/resize.js",
+      "js/additions/imageeditor/plugins/draw.js",
+      "js/additions/imageeditor/plugins/draw.background.js",
+      "js/additions/imageeditor/plugins/draw.text.js",
+      "js/additions/imageeditor/plugins/draw.free.js",
+      "js/additions/imageeditor/plugins/draw.baseobjects.js",
+      "js/additions/imageeditor/plugins/draw.image.js",
+      "js/additions/imageeditor/plugins/draw.cliparts.js",
+      "js/additions/imageeditor/plugins/history.js",
+      "js/libs/colorpicker/objlib.js",
+      "js/libs/colorpicker/cbox.js"
+    ],
+    "category": "Image Editor"
+  },
+  {
+    "outputFileName": "js\\buzzle.js",
+    "inputFiles": [
+      "js\\buzzle.js",
+      "js/utils/util.js",
+      "js/setting.js",
+      "js/utils/carriers.js",
+      "js/ui/lang.js",
+      "js/ui/ui.js",
+      "js/ui/userlist.js",
+      "js/ui/toast.js",
+      "js/ui/tab.js",
+      "js/ui/chat.js",
+      "js/ui/recent.js",
+      "js/ui/upload.js",
+      "js/ui/groupchat.js",
+      "js/ui/project.js",
+      "js/ui/sharedfolder.js",
+      "js/ui/polls.js",
+      "js/ui/uploadedfiles.js",
+      "js/ui/menu.js",
+      "js/socket.js",
+      "js/fileuploads.js",
+      "js/ui/input.js",
+      "js/ui/role.js",
+      "js/ui/group.js",
+      "js/ui/user.js",
+      "js/ui/log.js",
+      "js/ui/sysfile.js",
+      "js/ui/msgtmps.js",
+      "js/ui/search.js",
+      "js/ui/license.js",
+      "js/webrtc.js",
+      "js/utils/zonedate.js",
+      "js/ui/calendar.js",
+      "js/ui/listview.js",
+      "js/ui/GroupChatUserAdapter.js"
+    ]
+  },
+  {
+    "outputFileName": "cfad4332-b3a0-4cde-8d96-4a1742938808.js",
+    "inputFiles": [
+      "file1.js",
+      "file2.js"
+    ],
+    "includeInProject": true
+  }
+]

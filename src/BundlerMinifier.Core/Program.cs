@@ -232,7 +232,7 @@ namespace BundlerMinifier
         {
             // For console colors, see http://stackoverflow.com/questions/23975735/what-is-this-u001b9-syntax-of-choosing-what-color-text-appears-on-console
 
-            processor.Processing += (s, e) => { Console.WriteLine($"Processing {e.Bundle.OutputFileName.Cyan().Bright()}"); FileHelpers.RemoveReadonlyFlagFromFile(e.Bundle.GetAbsoluteOutputFile()); };
+            processor.Processing += (s, e) => { Console.WriteLine($"Processing {e.Bundle.OutputFileName.Cyan().Bright()}"); FileHelpers.RemoveReadonlyFlagFromFile(e.Bundle.OutputFileName); };
             processor.AfterBundling += (s, e) => { Console.WriteLine($"  Bundled".Green().Bright()); };
             processor.BeforeWritingSourceMap += (s, e) => { FileHelpers.RemoveReadonlyFlagFromFile(e.ResultFile); };
             processor.AfterWritingSourceMap += (s, e) => { Console.WriteLine($"  Sourcemapped".Green().Bright()); };
@@ -255,13 +255,49 @@ namespace BundlerMinifier
 
             if (file != null)
             {
-                if (file.StartsWith("*"))
+                int idx;
+                if (file.Contains('*') && (idx = file.IndexOf(':')) > 0)
                 {
-                    configs = configs.Where(c => Path.GetExtension(c.OutputFileName).Equals(file.Substring(1), StringComparison.OrdinalIgnoreCase));
+                    Console.WriteLine($"Processing : {file}");
+                    //category
+                    var category = file.Substring(idx + 1);
+                    if (category.Length == 0) category = null;
+                    file = file.Substring(0, idx);
+                    bool not = file.StartsWith("!");
+                    if (not)
+                    {
+                        file = file.Substring(1);
+                    }
+
+                    if (file.StartsWith("*")) file = file.Substring(1);
+                    var exts = file.Split('*');
+
+                    configs = configs.Where(c =>
+                    {
+
+                        //check category
+                        if (category == null)
+                        {
+                            if (!string.IsNullOrEmpty(c.Category)) return false;
+                        }
+                        else if (category != c.Category) return false;
+
+                        //file
+                        //extensions
+                        return exts.Contains(Path.GetExtension(c.OutputFileName), StringComparer.OrdinalIgnoreCase) != not;
+                    });
                 }
                 else
                 {
-                    configs = configs.Where(c => c.OutputFileName.Equals(file, StringComparison.OrdinalIgnoreCase));
+                    //default
+                    if (file.StartsWith("*"))
+                    {
+                        configs = configs.Where(c => Path.GetExtension(c.OutputFileName).Equals(file.Substring(1), StringComparison.OrdinalIgnoreCase));
+                    }
+                    else
+                    {
+                        configs = configs.Where(c => c.OutputFileName.Equals(file, StringComparison.OrdinalIgnoreCase));
+                    }
                 }
             }
 
