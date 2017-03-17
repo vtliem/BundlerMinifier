@@ -732,6 +732,15 @@ namespace BundlerMinifier
                         {
                             Config.MissingInputFiles.Add(inputFile);
                         }
+                        else if (IsResource)
+                        {
+                            string f = fullPath.Substring(Config.InputBaseLength + 1);
+                            var outPath = Path.Combine(output, f);
+                            if (outPath != fullPath)
+                                bundles.Add(new BundleExt(this, fullPath, outPath));
+                            else
+                                Config.MissingInputFiles.Add(inputFile);
+                        }
                         else //file != output && file != outputMin && !files.Contains(file)
                         {
                             files.Add(fullPath);
@@ -909,7 +918,7 @@ namespace BundlerMinifier
     public class BundleConfig
     {
         internal const string LOG_FILE = "bundleminifier_vtl.log";
-        internal static readonly FileFilters DefaultExcludes = new FileFilters(new string[] { "\\bbundleconfig\\.json$", "\\bbundleconfig\\.json\\.bindings$", "\\.ds\\_store$", "thumbs\\.db$", "\\b\\.svn\\b", "\\bbundleminifier_vtl\\.log$" });
+        internal static readonly FileFilters DefaultExcludes = new FileFilters(new string[] { "\\bbundleconfig.json", "\\bbundleconfig.json.bindings", "\\.ds_store", "\\bthumbs.db", "\\.svn", "\\bundleminifier_vtl.log" });
         internal static readonly FileFilters DefaultGZipExts = new FileFilters(new string[] { ".js", ".css", ".html", ".html", ".svg", ".woff", ".ttf", ".txt", ".json", ".md", ".bcmap" });
         internal static readonly FileFilters MinifySupporteds = new FileFilters(new string[] { ".js", ".css", ".html", ".html" });
         /// <summary>
@@ -1012,6 +1021,11 @@ namespace BundlerMinifier
             if (obj == null)
             {
                 writer.WriteLine("null");
+                return;
+            }
+            if (obj is string)
+            {
+                writer.WriteLine((string)obj);
                 return;
             }
             if (obj is System.Collections.IEnumerable)
